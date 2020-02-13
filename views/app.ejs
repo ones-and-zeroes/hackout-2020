@@ -1,0 +1,21 @@
+<%- include('header') -%>
+<div class="add-student">
+    <form action="/config" method="post">
+        <input type="text" name="new_student_name" placeholder="Student Name" autocomplete="off"/>
+        <button type="submit" name="button" value="add-student">+</button>
+    </form>
+
+    <div>
+        <form action="/config" method="post">
+            <% for(let i=0;i < students.length;i++){ %>
+                <label>
+                <p><%= "Name: " + students[i].name + " Token: " + students[i].tokens %></p>
+                <input type="checkbox" name="to_class" value= <%= i %> >
+                </label>
+            <% } %>
+            <button type="submit" name="button" value="generate-proxy">Generate Proxy</button>
+        </form>
+    </div>
+    <hr>
+</div>
+<%- include('footer') -%>

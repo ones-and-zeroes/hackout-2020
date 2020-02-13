@@ -1,0 +1,9 @@
+<%- include('header') -%>
+    <% for(let i=0;i < to_class.length;i++){ %>
+        <p><%= to_class[i].name %></p>
+    <% } %>
+    <hr>
+    <% for(let i=0;i < proxy.length;i++){ %>
+        <p><%= proxy[i].name %></p>
+    <% } %>
+<%- include('footer') -%>
