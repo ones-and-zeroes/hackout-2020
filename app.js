@@ -1,51 +1,73 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+mongoose.connect("mongodb://localhost:27017/proxify", { useNewUrlParser: true, useUnifiedTopology: true });
+
+const studentSchema = new mongoose.Schema({
+    name: String,
+    tokens: Number,
+    to_class: Boolean
+});
+
+const Student = mongoose.model("Student", studentSchema);
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-let students = [
-    {
-        name: "Shreyansh",
-        tokens: 10,
-        to_class: false
-    },
-    {
-        name: "Sharabh",
-        tokens: 1,
-        to_class: false
-    },
-    {
-        name: "Saumaya",
-        tokens: 2,
-        to_class: false
+let students = [];
+
+function update_students() {
+    Student.find((err, temp) => {
+        if (err)
+            console.log("Read error");
+        students = temp.slice(0);
+    });
+}
+
+function init_checks_to_false() {
+    for (let i = 0; i < students.length; i++) {
+        students[i].to_class = false;
     }
-];
+}
 
 app.get('/config', (req, res) => {
+    update_students();
+    update_students();
+    update_students();
+    init_checks_to_false();
+    console.log(students);
     res.render("app", {
         students: students
     });
 });
 
 app.post('/config', (req, res) => {
-    console.log(req.body);
     let button_choice = req.body.button;
     if (button_choice == 'add-student') {
-        students.push({
+
+        const new_student = new Student({
             name: req.body.new_student_name,
-            tokens: 0
+            tokens: 0,
+            to_class: false
         });
+
+        new_student.save();
+
         res.redirect('/config');
     }
     else if (button_choice == 'generate-proxy') {
-        console.log(req.body.to_class);
+
         for (let i = 0; i < req.body.to_class.length; i++) {
             students[i].to_class = true;
         }
         res.redirect('/proxy');
+    }
+    else if (button_choice == 'clear-all') {
+        Student.remove({}, (err) => { });
+        res.redirect('/config');
     }
 });
 
