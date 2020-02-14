@@ -210,12 +210,14 @@ let to_class = [];
 let proxy = [];
 
 app.get('/proxy', (req, res) => {
+    to_class = [];
+    proxy = [];
     Student.find((err, temp) => {
         if (err)
             console.log("Read error");
         students = temp.slice(0);
         for (let i = 0; i < students.length; i++) {
-            if (students[i].to_class)
+            if (students[i].to_class[current_class])
                 to_class.push(students[i]);
             else
                 proxy.push(students[i]);
@@ -226,7 +228,10 @@ app.get('/proxy', (req, res) => {
             if (a.tokens > b.tokens)
                 return -1;
             return 0;
-        })
+        });
+        let min = Math.min(to_class.length, proxy.length);
+        proxy = proxy.slice(0, min + 1);
+        to_class = to_class.slice(0, min + 1);
         res.render("proxy", {
             to_class: to_class,
             proxy: proxy
@@ -235,14 +240,20 @@ app.get('/proxy', (req, res) => {
 });
 
 app.post('/proxy', (req, res) => {
-    Student.find((err, temp) => {
-        if (err)
-            console.log("Read error");
-        let proxy_done = req.body.proxy_done;
-        students = temp.slice(0);
-        Student.updateOne({ _id: i }, { to_class: is_in_class }, (err) => { });
-        res.redirect('/proxy');
-    });
+    let proxy_done = req.body.proxy_done;
+    for (let i = 0; i < proxy.length; i++) {
+        let left_id = to_class[i]._id;
+        let right_id = proxy[i]._id;
+        Student.updateOne({ _id: left_id }, { $inc: { tokens: 1 } }, (err) => {
+            if (err)
+                console.log("Update error");
+        });
+        Student.updateOne({ _id: right_id }, { $inc: { tokens: -1 } }, (err) => {
+            if (err)
+                console.log("Update error");
+        });
+    }
+    res.redirect('/');
 });
 
 app.listen(3000, () => {
