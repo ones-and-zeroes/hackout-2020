@@ -1,0 +1,17 @@
+<%- include('header') -%>
+<h1 class="heading">
+    Welcome! Today is <%= date %> 
+</h1>
+<div class="classes-list">
+    <p class="class-text">Today's classes are</p>
+    <form action="/" method="post">
+        <ul>
+        <% for(let i=0;i < today.length;i++){ %>
+            <button class="link-button" type="submit" name="class" value= <%= today[i]._id %> > 
+                <li><%= today[i].class_name %> from <%= today[i].start_time %> to <%= today[i].end_time %></li>
+            </button><br><br>
+        <% } %>
+        </ul>
+    </form>
+</div>
+<%- include('footer') -%>

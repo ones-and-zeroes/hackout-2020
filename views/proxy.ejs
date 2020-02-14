@@ -4,6 +4,11 @@
     <% } %>
     <hr>
     <% for(let i=0;i < proxy.length;i++){ %>
-        <p><%= proxy[i].name %></p>
+        <form action="/proxy" method="post"></form>
+        <label>
+            <p><%= proxy[i].name %></p>
+            <input type="checkbox" name="proxy_done" value= <%= proxy[i]._id %>>
+        </label>
+        <button name="submit-proxy" type="submit">Submit</button>
     <% } %>
 <%- include('footer') -%>

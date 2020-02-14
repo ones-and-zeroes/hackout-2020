@@ -2,6 +2,7 @@
 <div class="add-student">
     <form action="/config" method="post">
         <input type="text" name="new_student_name" placeholder="Student Name" autocomplete="off"/>
+        <input type="text" name="tokens" placeholder="Tokens" autocomplete="off"/>
         <button type="submit" name="button" value="add-student">+</button>
     </form>
 
@@ -21,6 +22,5 @@
     <form action="/config" method="post">
         <button type="submit" name="button" value="clear-all">Clear all</button>
     </form>
-    <hr>
 </div>
 <%- include('footer') -%>
