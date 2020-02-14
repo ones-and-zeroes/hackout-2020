@@ -3,7 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-let port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
 const schedule = [
     //monday
@@ -130,7 +130,9 @@ const schedule = [
 
 //mongoose.connect("mongodb://localhost:27017/proxify", { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+//mongoose.connect(process.env.MONGODB_URI    , { useNewUrlParser: true, useUnifiedTopology: true });
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/proxify");
 
 const studentSchema = new mongoose.Schema({
     _id: Number,
@@ -260,8 +262,8 @@ app.post('/proxy', (req, res) => {
     res.redirect('/');
 });
 
-app.listen(3000, () => {
-    console.log('App listening on port 3000!');
+app.listen(port, () => {
+    console.log('App listening');
 });
 
 app.get('/', (req, res) => {
