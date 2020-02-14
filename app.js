@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 mongoose.connect("mongodb://localhost:27017/proxify", { useNewUrlParser: true, useUnifiedTopology: true });
 
 const studentSchema = new mongoose.Schema({
+    _id: Number,
     name: String,
     tokens: Number,
     to_class: Boolean
@@ -19,36 +20,31 @@ app.use(express.static('public'));
 
 let students = [];
 
-function update_students() {
+/* function nesting to avoid async execution. Earlier separated by two functions
+but it leas to execution of second function first and first one later leading to error.
+*/
+
+app.get('/config', (req, res) => {
+
     Student.find((err, temp) => {
         if (err)
             console.log("Read error");
         students = temp.slice(0);
+        res.render("app", {
+            students: students
+        });
     });
-}
 
-function init_checks_to_false() {
-    for (let i = 0; i < students.length; i++) {
-        students[i].to_class = false;
-    }
-}
-
-app.get('/config', (req, res) => {
-    update_students();
-    update_students();
-    update_students();
-    init_checks_to_false();
-    console.log(students);
-    res.render("app", {
-        students: students
-    });
 });
+
+let index = 0;
 
 app.post('/config', (req, res) => {
     let button_choice = req.body.button;
     if (button_choice == 'add-student') {
 
         const new_student = new Student({
+            _id: index++,
             name: req.body.new_student_name,
             tokens: 0,
             to_class: false
@@ -60,10 +56,17 @@ app.post('/config', (req, res) => {
     }
     else if (button_choice == 'generate-proxy') {
 
-        for (let i = 0; i < req.body.to_class.length; i++) {
-            students[i].to_class = true;
-        }
-        res.redirect('/proxy');
+        Student.find((err, temp) => {
+            if (err)
+                console.log("Read error");
+            students = temp.slice(0);
+            for (let i = 0; i < students.length; i++) {
+                Student.updateOne({ _id: i }, { to_class: (req.body.to_class.includes(i)) }, (err) => {
+                    console.log(req.body.to_class.includes(i));
+                });
+            }
+            res.redirect('/proxy');
+        });
     }
     else if (button_choice == 'clear-all') {
         Student.remove({}, (err) => { });
@@ -72,24 +75,29 @@ app.post('/config', (req, res) => {
 });
 
 app.get('/proxy', (req, res) => {
-    let to_class = [];
-    let proxy = [];
-    for (let i = 0; i < students.length; i++) {
-        if (students[i].to_class)
-            to_class.push(students[i]);
-        else
-            proxy.push(students[i]);
-    }
-    proxy.sort((a, b) => {
-        if (a.tokens < b.tokens)
-            return 1;
-        if (a.tokens > b.tokens)
-            return -1;
-        return 0;
-    })
-    res.render("proxy", {
-        to_class: to_class,
-        proxy: proxy
+    Student.find((err, temp) => {
+        if (err)
+            console.log("Read error");
+        students = temp.slice(0);
+        let to_class = [];
+        let proxy = [];
+        for (let i = 0; i < students.length; i++) {
+            if (students[i].to_class)
+                to_class.push(students[i]);
+            else
+                proxy.push(students[i]);
+        }
+        proxy.sort((a, b) => {
+            if (a.tokens < b.tokens)
+                return 1;
+            if (a.tokens > b.tokens)
+                return -1;
+            return 0;
+        })
+        res.render("proxy", {
+            to_class: to_class,
+            proxy: proxy
+        });
     });
 });
 
