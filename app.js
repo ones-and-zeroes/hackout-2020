@@ -7,28 +7,28 @@ const schedule = [
     //monday
     [
         {
-            "_id": "00",
+            "_id": 0,
             "class_name": "EO101 Lecture",
             "start_time": "8:00 am",
             "end_time": "8:55 am",
             "difficulty": "Easy"
         },
         {
-            "_id": "01",
+            "_id": 1,
             "class_name": "EO101 Lab",
             "start_time": "9:00 am",
             "end_time": "10:55 am",
             "difficulty": "Medium"
         },
         {
-            "_id": "02",
+            "_id": 2,
             "class_name": "MA102 Tutorial",
             "start_time": "11:00 am",
             "end_time": "11:55 am",
             "difficulty": "Very easy"
         },
         {
-            "_id": "03",
+            "_id": 3,
             "class_name": "EO101 Tutorial",
             "start_time": "3:30 pm",
             "end_time": "4:25 pm",
@@ -38,14 +38,14 @@ const schedule = [
     //tuesday
     [
         {
-            "_id": "10",
+            "_id": 4,
             "class_name": "MA102 Lecture",
             "start_time": "9:30 am",
             "end_time": "11:00 am",
             "difficulty": "Very Tough"
         },
         {
-            "_id": "11",
+            "_id": 5,
             "class_name": "CSE103 IT Workshop",
             "start_time": "1:30 pm",
             "end_time": "4:30 pm",
@@ -55,21 +55,21 @@ const schedule = [
     //wednesday
     [
         {
-            "_id": "20",
+            "_id": 6,
             "class_name": "EO101 Lecture",
             "start_time": "8:00 am",
             "end_time": "8:55 am",
             "difficulty": "Easy"
         },
         {
-            "_id": "21",
+            "_id": 7,
             "class_name": "EO101 Lab",
             "start_time": "9:00 am",
             "end_time": "10:55 am",
             "difficulty": "Medium"
         },
         {
-            "_id": "22",
+            "_id": 8,
             "class_name": "ME105 Tutorial",
             "start_time": "2:30 pm",
             "end_time": "5:30 pm",
@@ -79,21 +79,21 @@ const schedule = [
     //thursday
     [
         {
-            "_id": "30",
+            "_id": 9,
             "class_name": "MA102 Lecture",
             "start_time": "9:30 am",
             "end_time": "11:00 am",
             "difficulty": "Very Tough"
         },
         {
-            "_id": "31",
+            "_id": 10,
             "class_name": "CSE103N IT Workshop",
             "start_time": "11:00 am",
             "end_time": "1:00 pm",
             "difficulty": "No attendance taken !!!"
         },
         {
-            "_id": "32",
+            "_id": 11,
             "class_name": "H106",
             "start_time": "3:30 pm",
             "end_time": "5:30 pm",
@@ -103,21 +103,21 @@ const schedule = [
     //friday
     [
         {
-            "_id": "40",
+            "_id": 12,
             "class_name": "EO101 Lecture",
             "start_time": "8:00 am",
             "end_time": "8:55 am",
             "difficulty": "Easy"
         },
         {
-            "_id": "41",
+            "_id": 13,
             "class_name": "ME104 ED",
             "start_time": "9:00 am",
             "end_time": "12:55 pm",
             "difficulty": "IMPOSSIBLE !!!"
         },
         {
-            "_id": "42",
+            "_id": 14,
             "class_name": "H106",
             "start_time": "3:30 pm",
             "end_time": "5:30 pm",
@@ -132,17 +132,8 @@ const studentSchema = new mongoose.Schema({
     _id: Number,
     name: String,
     tokens: Number,
-    to_class: Boolean
+    to_class: [Boolean]
 });
-
-const classSchema = new mongoose.Schema({
-    //first digit is day and second is class index number
-    _id: Number,
-    in_class: [studentSchema],
-    proxy: [studentSchema]
-})
-
-const Class = mongoose.model("Class", classSchema);
 
 const Student = mongoose.model("Student", studentSchema);
 
@@ -166,7 +157,8 @@ app.get('/config', (req, res) => {
         students = temp.slice(0);
         index = students.length;
         res.render("app", {
-            students: students
+            students: students,
+            current_class: current_class
         });
     });
 
@@ -182,7 +174,7 @@ app.post('/config', (req, res) => {
             _id: index++,
             name: req.body.new_student_name,
             tokens: Number(req.body.tokens),
-            to_class: false
+            to_class: new Array(15).fill(false)
         });
 
         new_student.save();
@@ -201,7 +193,9 @@ app.post('/config', (req, res) => {
                     if (req.body.to_class[j] == i)
                         is_in_class = true;
                 }
-                Student.updateOne({ _id: i }, { to_class: is_in_class }, (err) => { });
+                let update_class = { "$set": {} };
+                update_class["$set"]["to_class." + current_class] = is_in_class;
+                Student.updateOne({ _id: i }, update_class, (err) => { });
             }
             res.redirect('/proxy');
         });
@@ -264,6 +258,6 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-    current_class = req.body.class;
+    current_class = Number(req.body.class);
     res.redirect('/config');
 });

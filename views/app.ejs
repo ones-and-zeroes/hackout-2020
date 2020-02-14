@@ -12,7 +12,7 @@
                 <label>
                 <p><%= "Name: " + students[i].name + " Token: " + students[i].tokens %></p>
                 <input type="checkbox" name="to_class" value= <%= students[i]._id %> 
-                <%= students[i].to_class? "checked" : "" %>
+                <%= students[i].to_class[current_class]? "checked" : "" %>
                 >
                 </label>
             <% } %>
