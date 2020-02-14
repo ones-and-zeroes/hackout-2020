@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+let port = process.env.PORT || 3000;
+
 const schedule = [
     //monday
     [
