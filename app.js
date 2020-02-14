@@ -61,9 +61,12 @@ app.post('/config', (req, res) => {
                 console.log("Read error");
             students = temp.slice(0);
             for (let i = 0; i < students.length; i++) {
-                Student.updateOne({ _id: i }, { to_class: (req.body.to_class.includes(i)) }, (err) => {
-                    console.log(req.body.to_class.includes(i));
-                });
+                let is_in_class = false;
+                for (let j = 0; j < req.body.to_class.length; j++) {
+                    if (req.body.to_class[j] == i)
+                        is_in_class = true;
+                }
+                Student.updateOne({ _id: i }, { to_class: is_in_class }, (err) => { });
             }
             res.redirect('/proxy');
         });
