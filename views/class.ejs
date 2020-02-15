@@ -4,7 +4,7 @@
 </h1>
 <div class="classes-list">
     <p class="class-text">Today's classes are</p>
-    <form action="/" method="post">
+    <form action="/root" method="post">
         <ul>
         <% for(let i=0;i < today.length;i++){ %>
             <button class="link-button" type="submit" name="class" value= <%= today[i]._id %> > 

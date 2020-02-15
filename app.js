@@ -236,8 +236,8 @@ app.get('/proxy', (req, res) => {
             return 0;
         });
         let min = Math.min(to_class.length, proxy.length);
-        proxy = proxy.slice(0, min + 1);
-        to_class = to_class.slice(0, min + 1);
+        proxy = proxy.slice(0, min);
+        to_class = to_class.slice(0, min);
         res.render("proxy", {
             to_class: to_class,
             proxy: proxy
@@ -259,14 +259,14 @@ app.post('/proxy', (req, res) => {
                 console.log("Update error");
         });
     }
-    res.redirect('/');
+    res.redirect('/root');
 });
 
 app.listen(port, () => {
     console.log('App listening');
 });
 
-app.get('/', (req, res) => {
+app.get('/root', (req, res) => {
     let date = new Date().toLocaleDateString("en-us", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     res.render("class", {
         date: date,
@@ -274,7 +274,35 @@ app.get('/', (req, res) => {
     });
 });
 
-app.post('/', (req, res) => {
+app.post('/root', (req, res) => {
     current_class = Number(req.body.class);
     res.redirect('/config');
+});
+
+app.get('/leader', (req, res) => {
+    Student.find((err, temp) => {
+        if (err)
+            console.log("Read error");
+        students = temp.slice(0);
+
+        temp.sort((a, b) => {
+            if (a.tokens < b.tokens)
+                return 1;
+            if (a.tokens > b.tokens)
+                return -1;
+            return 0;
+        });
+
+        res.render("leader", {
+            ranks: temp,
+        });
+    });
+});
+
+app.get('/', (req, res) => {
+    res.sendFile('index.html');
+});
+
+app.post('/', (req, res) => {
+    res.redirect('/root');
 });

@@ -1,15 +1,15 @@
 <%- include('header') -%>
+<form action="/proxy" method="post">
+  <div class="proxy">
     <% for(let i=0;i < to_class.length;i++){ %>
-        <p><%= to_class[i].name %></p>
+    <p><%= to_class[i].name %></p>
+    <p>will mark proxy of</p>
+    <p><%= proxy[i].name %></p>
+    <p>&emsp; Successful?</p>
+    <input type="checkbox" name="proxy_done" value= <%= proxy[i]._id %>>
+    <br /><br />
     <% } %>
-    <hr>
-    <% for(let i=0;i < proxy.length;i++){ %>
-        <form action="/proxy" method="post">
-            <label>
-                <p><%= proxy[i].name %></p>
-                <input type="checkbox" name="proxy_done" value= <%= proxy[i]._id %>>
-            </label>
-    <% } %>
-            <button name="submit-proxy" type="submit">Submit</button>
-        </form>
+  </div>
+  <button class="fill" name="submit-proxy" type="submit">Submit</button>
+</form>
 <%- include('footer') -%>
