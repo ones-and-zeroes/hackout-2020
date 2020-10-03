@@ -10,7 +10,8 @@ Proxify is a proxy management web app for hackout 2020. It helps you get your pr
 - Higher tokens more chance of successful proxy.
 - Leaderboard system implemented to decide among the best of the best proxy masters.
 
-# Site is live at https://polar-island-79123.herokuapp.com
+## ~~Site is live at https://polar-island-79123.herokuapp.com~~
+SITE DOWN
 
 # Technologies used
 
